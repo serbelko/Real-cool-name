@@ -447,11 +447,13 @@ def skill_upgrade():
         boots_button = font.render("SPEEDY BOOTS", True, WHITE)
         stone_button = font.render("HEALING STONE", True, WHITE)
         shield_button = font.render("MAGIC SHIELD", True, WHITE)
+        exit_button = font.render("Exit", True, WHITE)
 
         screen.blit(shop_text, (SCREEN_WIDTH // 2 - shop_text.get_width() // 2, 100))
         screen.blit(boots_button, (15, 250))
         screen.blit(stone_button, (SCREEN_WIDTH // 2 - stone_button.get_width() // 2, 250))
         screen.blit(shield_button, (SCREEN_WIDTH - 200, 250))
+        screen.blit(exit_button, (SCREEN_WIDTH // 2 - exit_button.get_width() // 2, 400))
 
         pygame.display.flip()
 
@@ -461,8 +463,9 @@ def skill_upgrade():
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_x, mouse_y = event.pos
-                if boots_button.get_rect(center=(SCREEN_WIDTH // 2, 300)).collidepoint(mouse_x, mouse_y):
+                if exit_button.get_rect(center=(SCREEN_WIDTH // 2, 400)).collidepoint(mouse_x, mouse_y):
                     return
+
 
 
 def reset_game():
