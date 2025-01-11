@@ -1,4 +1,4 @@
-#комментарий для коммита
+# комментарий для коммита
 
 import random
 import sys
@@ -27,7 +27,6 @@ ATTACK_DURATION = 200
 HITBOX_WIDTH = 50
 HITBOX_HEIGHT = 30
 
-
 wave_active = False
 enemies_to_spawn = 0
 enemies_killed = 0
@@ -35,8 +34,6 @@ spawn_timer = 0
 spawn_interval = 2000
 
 PLAYER_MAX_HEALTH = 1000000000
-
-
 
 # Инициализация окна
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -81,6 +78,14 @@ class Player(pygame.sprite.Sprite):
 
     def add_currency(self, amount):
         self.currency += amount
+
+    def spend_currency(cost):
+        global player_currency
+        if player_currency >= cost:
+            player_currency -= cost
+            return True
+        else:
+            return False
 
     def switch_weapon(self, new_weapon):
         self.weapon = new_weapon
@@ -435,6 +440,31 @@ def pause_menu():
                     sys.exit()
 
 
+def skill_upgrade():
+    while True:
+        screen.fill(BLACK)
+        shop_text = font.render("SHOP", True, WHITE)
+        boots_button = font.render("SPEEDY BOOTS", True, WHITE)
+        stone_button = font.render("HEALING STONE", True, WHITE)
+        shield_button = font.render("MAGIC SHIELD", True, WHITE)
+
+        screen.blit(shop_text, (SCREEN_WIDTH // 2 - shop_text.get_width() // 2, 100))
+        screen.blit(boots_button, (15, 250))
+        screen.blit(stone_button, (SCREEN_WIDTH // 2 - stone_button.get_width() // 2, 250))
+        screen.blit(shield_button, (SCREEN_WIDTH - 200, 250))
+
+        pygame.display.flip()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_x, mouse_y = event.pos
+                if boots_button.get_rect(center=(SCREEN_WIDTH // 2, 300)).collidepoint(mouse_x, mouse_y):
+                    return
+
+
 def reset_game():
     global player, player_group, bullets, enemies, enemy_bullets, last_shot_time
     player = Player()
@@ -534,6 +564,7 @@ while running:
         if wave_active and enemies_killed >= enemies_to_spawn:
             print("Волна закончена")
             wave_active = False
+            skill_upgrade()
 
     # Обновления
     player.update(keys)
