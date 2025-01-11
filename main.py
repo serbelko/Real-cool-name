@@ -1,6 +1,7 @@
-import pygame
 import random
 import sys
+
+import pygame
 
 pygame.init()
 
@@ -24,7 +25,16 @@ ATTACK_DURATION = 200
 HITBOX_WIDTH = 50
 HITBOX_HEIGHT = 30
 
-PLAYER_MAX_HEALTH = 100
+
+wave_active = False
+enemies_to_spawn = 0
+enemies_killed = 0
+spawn_timer = 0
+spawn_interval = 2000
+
+PLAYER_MAX_HEALTH = 1000000000
+
+
 
 # Инициализация окна
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -33,6 +43,7 @@ pygame.display.set_caption("Real Cool game")
 font = pygame.font.Font(None, 36)
 clock = pygame.time.Clock()
 last_shot_time = 0
+
 
 # --------------------------------------------------------------------- #
 #                           КЛАССЫ                                      #
@@ -125,6 +136,7 @@ class Player(pygame.sprite.Sprite):
 
 class Bullet(pygame.sprite.Sprite):
     """Пуля игрока."""
+
     def __init__(self, x, y, target_x, target_y):
         super().__init__()
         self.image = pygame.Surface((10, 10))
@@ -139,12 +151,13 @@ class Bullet(pygame.sprite.Sprite):
         self.rect.x += self.velocity.x
         self.rect.y += self.velocity.y
         if (self.rect.right < 0 or self.rect.left > SCREEN_WIDTH or
-            self.rect.bottom < 0 or self.rect.top > SCREEN_HEIGHT):
+                self.rect.bottom < 0 or self.rect.top > SCREEN_HEIGHT):
             self.kill()
 
 
 class EnemyBullet(pygame.sprite.Sprite):
     """Снаряд, выпущенный врагом."""
+
     def __init__(self, x, y, target_x, target_y, speed=6):
         super().__init__()
         self.image = pygame.Surface((10, 10))
@@ -159,7 +172,7 @@ class EnemyBullet(pygame.sprite.Sprite):
         self.rect.x += self.velocity.x
         self.rect.y += self.velocity.y
         if (self.rect.right < 0 or self.rect.left > SCREEN_WIDTH or
-            self.rect.bottom < 0 or self.rect.top > SCREEN_HEIGHT):
+                self.rect.bottom < 0 or self.rect.top > SCREEN_HEIGHT):
             self.kill()
 
 
@@ -219,6 +232,7 @@ class RangedEnemy(pygame.sprite.Sprite):
     Если игрок слишком далеко (> max_distance) – приближаемся.
     Если в диапазоне [min_distance, max_distance], стреляем.
     """
+
     def __init__(self):
         super().__init__()
         self.image = pygame.Surface((50, 50))
@@ -228,9 +242,9 @@ class RangedEnemy(pygame.sprite.Sprite):
         self.rect.y = random.randint(0, SCREEN_HEIGHT - self.rect.height)
 
         # “Рабочее” окно стрельбы
-        self.min_distance = 150   # если игрок ближе, отходим
-        self.max_distance = 350   # если игрок дальше, приближаемся
-        self.shot_cooldown = 1200 # мс
+        self.min_distance = 150  # если игрок ближе, отходим
+        self.max_distance = 350  # если игрок дальше, приближаемся
+        self.shot_cooldown = 1200  # мс
         self.last_shot_time = 0
         self.speed = 2
 
@@ -289,6 +303,7 @@ class RangedEnemy(pygame.sprite.Sprite):
         # Делаем ограничение по экрану, чтобы враг не вышел за границы
         self.rect.clamp_ip(pygame.Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT))
 
+
 # --------------------------------------------------------------------- #
 #                       СОЗДАНИЕ ГРУПП ОБЪЕКТОВ                         #
 # --------------------------------------------------------------------- #
@@ -299,6 +314,7 @@ player_group = pygame.sprite.Group(player)
 bullets = pygame.sprite.Group()
 enemy_bullets = pygame.sprite.Group()
 enemies = pygame.sprite.Group()
+
 
 # --------------------------------------------------------------------- #
 #                       МЕНЮ И СИСТЕМНЫЕ ФУНКЦИИ                        #
@@ -323,6 +339,7 @@ def settings_menu():
                 mouse_x, mouse_y = event.pos
                 if back_button_text.get_rect(center=(SCREEN_WIDTH // 2, 400)).collidepoint(mouse_x, mouse_y):
                     return
+
 
 def main_menu():
     while True:
@@ -353,6 +370,7 @@ def main_menu():
                     pygame.quit()
                     sys.exit()
 
+
 def game_over():
     while True:
         screen.fill(BLACK)
@@ -379,6 +397,7 @@ def game_over():
                     sys.exit()
     return False
 
+
 def pause_menu():
     while True:
         screen.fill(BLACK)
@@ -404,6 +423,7 @@ def pause_menu():
                     pygame.quit()
                     sys.exit()
 
+
 def reset_game():
     global player, player_group, bullets, enemies, enemy_bullets, last_shot_time
     player = Player()
@@ -412,6 +432,22 @@ def reset_game():
     enemy_bullets = pygame.sprite.Group()
     enemies = pygame.sprite.Group()
     last_shot_time = 0
+
+
+def next_wave():
+    global wave_active, enemies_to_spawn, enemies_killed
+    wave_active = True
+    enemies_to_spawn += 2
+    enemies_killed = 0
+
+
+def spawn_enemy():
+    if len(enemies) < enemies_to_spawn:
+        if random.random() < 0.5:
+            enemy = MeleeEnemy()
+        else:
+            enemy = RangedEnemy()
+        enemies.add(enemy)
 
 
 # --------------------------------------------------------------------- #
@@ -468,13 +504,25 @@ while running:
             else:
                 player.start_melee_attack()
 
+        # Клик V - нов
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_v and not wave_active:
+                next_wave()
+
         # Спавн врагов
-        if event.type == spawn_enemy_event:
-            # С вероятностью 50% спавним ближнего, 50% дальнего
-            if random.random() < 0.5:
-                enemies.add(MeleeEnemy())
-            else:
-                enemies.add(RangedEnemy())
+        if wave_active:
+            current_time = pygame.time.get_ticks()
+            if current_time - spawn_timer > spawn_interval:
+                spawn_timer = current_time
+                # С вероятностью 50% спавним ближнего, 50% дальнего
+                if random.random() < 0.5:
+                    enemies.add(MeleeEnemy())
+                else:
+                    enemies.add(RangedEnemy())
+
+        if wave_active and enemies_killed >= enemies_to_spawn:
+            print("Волна закончена")
+            wave_active = False
 
     # Обновления
     player.update(keys)
@@ -494,6 +542,7 @@ while running:
     # Пули игрока против врагов
     for enemy in enemies:
         if pygame.sprite.spritecollide(enemy, bullets, True):
+            enemies_killed += 1
             enemy.kill()
 
     # Вражеские пули против игрока
