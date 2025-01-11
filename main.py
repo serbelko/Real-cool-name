@@ -73,6 +73,15 @@ class Player(pygame.sprite.Sprite):
         # Здоровье
         self.health = PLAYER_MAX_HEALTH
 
+        # Кошелек
+        self.currency = 0
+
+        # Скиллы
+        self.skills = {}
+
+    def add_currency(self, amount):
+        self.currency += amount
+
     def switch_weapon(self, new_weapon):
         self.weapon = new_weapon
         self.is_attacking = False
@@ -546,6 +555,7 @@ while running:
         if pygame.sprite.spritecollide(enemy, bullets, True):
             enemies_killed += 1
             enemy.kill()
+            player.currency += 10
 
     # Вражеские пули против игрока
     hits = pygame.sprite.spritecollide(player, enemy_bullets, True)
@@ -574,6 +584,10 @@ while running:
     # Отображаем здоровье игрока
     health_text = font.render(f"HP: {player.health}", True, WHITE)
     screen.blit(health_text, (10, 10))
+
+    # Отображаем кошелек игрока
+    currency_text = font.render(f'GOLD: {player.currency}', True, WHITE)
+    screen.blit(currency_text, (10, 30))
 
     pygame.display.flip()
     clock.tick(60)
