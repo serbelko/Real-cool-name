@@ -1,3 +1,5 @@
+#комментарий для коммита
+
 import random
 import sys
 
