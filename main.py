@@ -70,6 +70,9 @@ class Player(pygame.sprite.Sprite):
         # Здоровье
         self.health = PLAYER_MAX_HEALTH
 
+        # скорость
+        self.speed = PLAYER_SPEED
+
         # Кошелек
         self.currency = 0
 
@@ -104,13 +107,13 @@ class Player(pygame.sprite.Sprite):
     def update(self, keys):
         dx, dy = 0, 0
         if keys[pygame.K_w] and self.rect.top > 0:
-            dy -= PLAYER_SPEED
+            dy -= self.speed
         if keys[pygame.K_s] and self.rect.bottom < SCREEN_HEIGHT:
-            dy += PLAYER_SPEED
+            dy += self.speed
         if keys[pygame.K_a] and self.rect.left > 0:
-            dx -= PLAYER_SPEED
+            dx -= self.speed
         if keys[pygame.K_d] and self.rect.right < SCREEN_WIDTH:
-            dx += PLAYER_SPEED
+            dx += self.speed
 
         self.rect.x += dx
         self.rect.y += dy
@@ -465,7 +468,15 @@ def skill_upgrade():
                 mouse_x, mouse_y = event.pos
                 if exit_button.get_rect(center=(SCREEN_WIDTH // 2, 400)).collidepoint(mouse_x, mouse_y):
                     return
-
+                if boots_button.get_rect(center=(15, 250)).collidepoint(mouse_x, mouse_y):
+                    player.speed += 5
+                    return
+                if stone_button.get_rect(center=(SCREEN_WIDTH // 2, 250)).collidepoint(mouse_x, mouse_y):
+                    player.health += 20
+                    return
+                if shield_button.get_rect(center=(SCREEN_WIDTH - 200, 250)).collidepoint(mouse_x, mouse_y):
+                    player.health += 2
+                    return
 
 
 def reset_game():
