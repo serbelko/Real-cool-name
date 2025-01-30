@@ -1,0 +1,12 @@
+# Логи
+logs/
+*.log
+
+
+venv/
+
+# Кеш Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
