@@ -1,4 +1,4 @@
-# комментарий для коммита
+    # комментарий для коммита
 
 import random
 import sys
@@ -23,6 +23,9 @@ player_group = pygame.sprite.Group(player)
 
 bullets = pygame.sprite.Group()
 enemies = pygame.sprite.Group()
+current_wave_enemies = pygame.sprite.Group()
+enemies_to_spawn = 10  # Количество врагов в волне (можно изменять для разных волн)
+spawned_enemies = 0  # Счетчик заспавненных врагов
 
 
 def settings_menu():
@@ -176,10 +179,11 @@ def reset_game():
 
 
 def next_wave():
-    global wave_active, enemies_to_spawn, enemies_killed
+    global wave_active, enemies_to_spawn, spawned_enemies, current_wave_enemies
     wave_active = True
-    enemies_to_spawn += 2
-    enemies_killed = 0
+    enemies_to_spawn += 5  # Увеличиваем сложность волн (можно менять)
+    spawned_enemies = 0  # Обнуляем счетчик заспавненных врагов
+    current_wave_enemies.empty()  # Очищаем группу врагов
 
 
 def spawn_enemy():
@@ -245,23 +249,28 @@ while running:
             else:
                 player.start_melee_attack()
 
-        # Клик V - нов
+        # Клик V - волна
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_v and not wave_active:
                 next_wave()
 
         # Спавн врагов
-        if wave_active:
+        if event.type == spawn_enemy_event and wave_active and spawned_enemies < enemies_to_spawn:
+        
             current_time = pygame.time.get_ticks()
             if current_time - spawn_timer > spawn_interval:
                 spawn_timer = current_time
-                # С вероятностью 50% спавним ближнего, 50% дальнего
                 if random.random() < 0.5:
-                    enemies.add(MeleeEnemy())
+                    enemy = MeleeEnemy()
                 else:
-                    enemies.add(RangedEnemy())
+                    enemy = RangedEnemy()
 
-        if wave_active and enemies_killed >= enemies_to_spawn:
+                enemies.add(enemy)
+                current_wave_enemies.add(enemy)
+                spawned_enemies += 1
+                
+
+        if wave_active and spawned_enemies == enemies_to_spawn and len(current_wave_enemies) == 0:
             print("Волна закончена")
             wave_active = False
             skill_upgrade()
@@ -282,11 +291,12 @@ while running:
         player.update_melee_attack(enemies)
 
     # Пули игрока против врагов
-    for enemy in enemies:
+    for enemy in current_wave_enemies:
         if pygame.sprite.spritecollide(enemy, bullets, True):
             enemies_killed += 1
             enemy.kill()
             player.currency += 10
+            current_wave_enemies.remove(enemy)
 
     # Вражеские пули против игрока
     hits = pygame.sprite.spritecollide(player, enemy_bullets, True)

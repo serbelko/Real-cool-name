@@ -22,6 +22,6 @@ wave_active = False
 enemies_to_spawn = 0
 enemies_killed = 0
 spawn_timer = 0
-spawn_interval = 2000
+spawn_interval = 2
 
 PLAYER_MAX_HEALTH = 1000000000
