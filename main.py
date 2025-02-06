@@ -206,6 +206,38 @@ pygame.time.set_timer(spawn_enemy_event, 2000)  # Спавним врагов к
 
 running = True
 
+
+class Map:
+    def __init__(self, fight_arena, SCREEN_WIDTH, SCREEN_HEIGHT):
+        # Загрузка изображения карты
+        self.image = pygame.image.load('fight_arena.png').convert()
+        self.rect = self.image.get_rect()
+
+        # Создание хитбоксов (10 пикселей от краев окна)
+        self.hitboxes = [
+            pygame.Rect(0, 0, SCREEN_WIDTH, 10),  # Верхний хитбокс
+            pygame.Rect(0, SCREEN_HEIGHT - 10, SCREEN_WIDTH, 10),  # Нижний хитбокс
+            pygame.Rect(0, 0, 10, SCREEN_HEIGHT),  # Левый хитбокс
+            pygame.Rect(SCREEN_WIDTH - 10, 0, 10, SCREEN_HEIGHT)  # Правый хитбокс
+        ]
+
+    def draw(self, screen):
+        #Отрисовка карты на экране.
+        screen.blit(self.image, self.rect)
+
+    def draw_hitboxes(self, screen):
+        #"""Отрисовка хитбоксов (для отладки)."""
+        for hitbox in self.hitboxes:
+            pygame.draw.rect(screen, RED, hitbox, 2)
+
+    def check_collision(self, sprite):
+        #"""Проверка столкновения спрайта с хитбоксами."""
+        for hitbox in self.hitboxes:
+            if sprite.rect.colliderect(hitbox):
+                return True
+        return False
+
+
 while running:
     keys = pygame.key.get_pressed()
     screen.fill(BLACK)
