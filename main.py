@@ -10,7 +10,7 @@ pygame.init()
 
 from settings import *
 
-# Инициализация окна
+# Инициализация окна............
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Real Cool game")
 
@@ -23,6 +23,8 @@ player_group = pygame.sprite.Group(player)
 
 bullets = pygame.sprite.Group()
 enemies = pygame.sprite.Group()
+
+
 
 
 # --------------------------------------------------------------------- #
