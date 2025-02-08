@@ -320,6 +320,7 @@ while running:
             print(enemy.hp)
             if enemy.hp <= 0:
                 enemy.kill()
+                enemies_killed += 1
                 current_wave_enemies.remove(enemy)
             player.currency += 10
 
