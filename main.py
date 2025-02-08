@@ -35,14 +35,7 @@ spawned_enemies = 0  # Счетчик заспавненных врагов
 menu_bg = pygame.image.load('assetspngs/main_menu.png').convert_alpha()
 pause_bg = pygame.image.load('assetspngs/pause_menu.png').convert_alpha()
 instructions = pygame.image.load('assetspngs/instructions.png').convert_alpha()
-
-
-def instruction():
-    instruction_start_time = pygame.time.get_ticks()
-    show_continue_text = False
-
-    running = True
-
+enter = pygame.image.load('assetspngs/ENTER.png').convert_alpha()
 
 
 def settings_menu():
@@ -66,10 +59,38 @@ def settings_menu():
                     return
 
 
+
+def show_instructions():
+    instruction_start_time = pygame.time.get_ticks()  # Get current time
+    show_continue_text = False  # Track when to show the "Press Enter" text
+
+    running = True
+    while running:
+        screen.fill((0, 0, 0))  # Clear screen
+        screen.blit(instructions, (0, 0))  # Show instructions image
+
+        # Check if 10 seconds have passed
+        if pygame.time.get_ticks() - instruction_start_time > 2000:
+            show_continue_text = True  # Show "Press Enter to Continue"
+
+        if show_continue_text:
+            text_surface = font.render("Press ENTER to continue", True, (255, 255, 255))
+            screen.blit(text_surface, (250, 560))
+
+        pygame.display.flip()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN and show_continue_text:
+                if event.key == pygame.K_RETURN:
+                    return
+
+
 def main_menu():
     while True:
         screen.blit(menu_bg, (0, 0))
-
         pygame.display.flip()
 
         for event in pygame.event.get():
@@ -79,7 +100,7 @@ def main_menu():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_x, mouse_y = event.pos
                 if 349 <= mouse_x <= 466 and 250 <= mouse_y <= 303:
-                    screen.blit(instructions, (0, 0))
+                    show_instructions()
                     return
                 if 349 <= mouse_x <= 466 and 313 <= mouse_y <= 370:
                     settings_menu()
@@ -333,7 +354,6 @@ while running:
                 enemies_killed += 1
                 current_wave_enemies.remove(enemy)
                 player.currency += 10
-
 
     # Вражеские пули против игрока
     hits = pygame.sprite.spritecollide(player, enemy_bullets, True)
