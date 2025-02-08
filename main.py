@@ -33,6 +33,7 @@ current_wave_enemies = pygame.sprite.Group()
 enemies_to_spawn = 10  # Количество врагов в волне (можно изменять для разных волн)
 spawned_enemies = 0  # Счетчик заспавненных врагов
 menu_bg = pygame.image.load('main_menu.png').convert_alpha()
+pause_bg = pygame.image.load('pause_menu.png').convert_alpha()
 
 
 def settings_menu():
@@ -106,14 +107,7 @@ def game_over():
 
 def pause_menu():
     while True:
-        screen.fill(BLACK)
-        pause_text = font.render("Paused", True, WHITE)
-        resume_button = font.render("Resume", True, WHITE)
-        exit_button = font.render("Exit", True, WHITE)
-
-        screen.blit(pause_text, (SCREEN_WIDTH // 2 - pause_text.get_width() // 2, 200))
-        screen.blit(resume_button, (SCREEN_WIDTH // 2 - resume_button.get_width() // 2, 300))
-        screen.blit(exit_button, (SCREEN_WIDTH // 2 - exit_button.get_width() // 2, 400))
+        screen.blit(pause_bg, (0, 0))
 
         pygame.display.flip()
 
@@ -123,9 +117,9 @@ def pause_menu():
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_x, mouse_y = event.pos
-                if resume_button.get_rect(center=(SCREEN_WIDTH // 2, 300)).collidepoint(mouse_x, mouse_y):
+                if 341 <= mouse_x <= 458 and 250 <= mouse_y <= 303:
                     return
-                if exit_button.get_rect(center=(SCREEN_WIDTH // 2, 400)).collidepoint(mouse_x, mouse_y):
+                if 341 <= mouse_x <= 458 and 315 <= mouse_y <= 368:
                     pygame.quit()
                     sys.exit()
 
