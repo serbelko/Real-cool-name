@@ -32,8 +32,17 @@ enemies = pygame.sprite.Group()
 current_wave_enemies = pygame.sprite.Group()
 enemies_to_spawn = 10  # Количество врагов в волне (можно изменять для разных волн)
 spawned_enemies = 0  # Счетчик заспавненных врагов
-menu_bg = pygame.image.load('main_menu.png').convert_alpha()
-pause_bg = pygame.image.load('pause_menu.png').convert_alpha()
+menu_bg = pygame.image.load('assetspngs/main_menu.png').convert_alpha()
+pause_bg = pygame.image.load('assetspngs/pause_menu.png').convert_alpha()
+instructions = pygame.image.load('assetspngs/instructions.png').convert_alpha()
+
+
+def instruction():
+    instruction_start_time = pygame.time.get_ticks()
+    show_continue_text = False
+
+    running = True
+
 
 
 def settings_menu():
@@ -70,6 +79,7 @@ def main_menu():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_x, mouse_y = event.pos
                 if 349 <= mouse_x <= 466 and 250 <= mouse_y <= 303:
+                    screen.blit(instructions, (0, 0))
                     return
                 if 349 <= mouse_x <= 466 and 313 <= mouse_y <= 370:
                     settings_menu()
@@ -322,7 +332,7 @@ while running:
                 enemy.kill()
                 enemies_killed += 1
                 current_wave_enemies.remove(enemy)
-            player.currency += 10
+                player.currency += 10
 
 
     # Вражеские пули против игрока
