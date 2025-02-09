@@ -7,8 +7,18 @@ enemy_bullets = pygame.sprite.Group()
 class MeleeEnemy(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.image = pygame.Surface((50, 50))
-        self.image.fill(RED)
+
+        # Коэффициент увеличения (2x)
+        self.scale_factor = 2
+
+        # Загрузка анимаций (только вправо и влево)
+        self.animations = {
+            "right": [self.load_and_scale(f"sprites/melee/melee_right_{i}.png") for i in range(9)],
+            "left": [self.load_and_scale(f"sprites/melee/melee_left_{i}.png") for i in range(9)]
+        }
+
+        # Начальные параметры
+        self.image = self.animations["right"][0]  # Начальное изображение
         self.rect = self.image.get_rect()
         self.rect.x = random.randint(0, SCREEN_WIDTH - self.rect.width)
         self.rect.y = random.randint(0, SCREEN_HEIGHT - self.rect.height)
@@ -18,8 +28,19 @@ class MeleeEnemy(pygame.sprite.Sprite):
         self.melee_damage = 20
         self.attack_cooldown = 1500  # мс
         self.last_attack_time = 0
-
         self.speed = 2
+
+        # Анимация
+        self.current_frame = 0
+        self.frame_rate = 150  # Скорость анимации (мс)
+        self.last_update = pygame.time.get_ticks()
+        self.direction = "right"  # Начальное направление
+
+    def load_and_scale(self, path):
+        """Загружает и увеличивает изображение в 2 раза"""
+        img = pygame.image.load(path).convert_alpha()
+        new_size = (img.get_width() * self.scale_factor, img.get_height() * self.scale_factor)
+        return pygame.transform.scale(img, new_size)
 
     def distance_to(self, player):
         return pygame.math.Vector2(
@@ -34,6 +55,10 @@ class MeleeEnemy(pygame.sprite.Sprite):
         )
         if direction.length() != 0:
             direction = direction.normalize()
+
+            # Используем "right" и "left" даже при движении вверх и вниз
+            self.direction = "right" if direction.x > 0 else "left"
+
         self.rect.x += direction.x * self.speed
         self.rect.y += direction.y * self.speed
 
@@ -47,9 +72,19 @@ class MeleeEnemy(pygame.sprite.Sprite):
                 self.last_attack_time = current_time
                 print("MeleeEnemy атакует! HP игрока:", player.health)
 
+    def update_animation(self):
+        """Обновляет анимацию движения"""
+        now = pygame.time.get_ticks()
+        if now - self.last_update > self.frame_rate:
+            self.last_update = now
+            self.current_frame = (self.current_frame + 1) % len(self.animations["right"])
+            self.image = self.animations[self.direction][self.current_frame]
+
     def update(self, player):
         self.move_towards(player)
         self.try_melee_attack(player)
+        self.update_animation()
+
 
 
 # --------------------- ВРАГ ДАЛЬНЕГО БОЯ --------------------------------
