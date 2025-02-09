@@ -4,16 +4,9 @@ import random
 import sys
 from settings import *
 import pygame
-from sprites import *  # комментарий для коммита
-
-import random
-import sys
-from settings import *
-import pygame
 from sprites import *
 
 pygame.init()
-
 from settings import *
 
 # Инициализация окна
@@ -26,16 +19,17 @@ last_shot_time = 0
 
 player = Player()
 player_group = pygame.sprite.Group(player)
-
 bullets = pygame.sprite.Group()
 enemies = pygame.sprite.Group()
 current_wave_enemies = pygame.sprite.Group()
 enemies_to_spawn = 10  # Количество врагов в волне (можно изменять для разных волн)
 spawned_enemies = 0  # Счетчик заспавненных врагов
-menu_bg = pygame.image.load('main_menu.png').convert_alpha()
-pause_bg = pygame.image.load('pause_menu.png').convert_alpha()
-
-
+menu_bg = pygame.image.load('assetspngs/main_menu.png').convert_alpha()
+pause_bg = pygame.image.load('assetspngs/pause_menu.png').convert_alpha()
+instructions = pygame.image.load('assetspngs/instructions.png').convert_alpha()
+enter = pygame.image.load('assetspngs/ENTER.png').convert_alpha()
+shop = pygame.image.load('assetspngs/shop_menu.png').convert_alpha()
+map1 = pygame.image.load('assetspngs/maps/map1.png').convert_alpha()
 def settings_menu():
     while True:
         screen.fill(BLACK)
@@ -57,10 +51,38 @@ def settings_menu():
                     return
 
 
+
+def show_instructions():
+    instruction_start_time = pygame.time.get_ticks()  # Get current time
+    show_continue_text = False  # Track when to show the "Press Enter" text
+
+    running = True
+    while running:
+        screen.fill((0, 0, 0))  # Clear screen
+        screen.blit(instructions, (0, 0))  # Show instructions image
+
+        # Check if 10 seconds have passed
+        if pygame.time.get_ticks() - instruction_start_time > 2000:
+            show_continue_text = True  # Show "Press Enter to Continue"
+
+        if show_continue_text:
+            text_surface = font.render("Press ENTER to continue", True, (255, 255, 255))
+            screen.blit(text_surface, (250, 560))
+
+        pygame.display.flip()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN and show_continue_text:
+                if event.key == pygame.K_RETURN:
+                    return
+
+
 def main_menu():
     while True:
         screen.blit(menu_bg, (0, 0))
-
         pygame.display.flip()
 
         for event in pygame.event.get():
@@ -70,6 +92,7 @@ def main_menu():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_x, mouse_y = event.pos
                 if 349 <= mouse_x <= 466 and 250 <= mouse_y <= 303:
+                    show_instructions()
                     return
                 if 349 <= mouse_x <= 466 and 313 <= mouse_y <= 370:
                     settings_menu()
@@ -126,19 +149,7 @@ def pause_menu():
 
 def skill_upgrade():
     while True:
-        screen.fill(BLACK)
-        shop_text = font.render("SHOP", True, WHITE)
-        boots_button = font.render("SPEEDY BOOTS", True, WHITE)
-        stone_button = font.render("HEALING STONE", True, WHITE)
-        shield_button = font.render("MAGIC SHIELD", True, WHITE)
-        exit_button = font.render("Exit", True, WHITE)
-
-        screen.blit(shop_text, (SCREEN_WIDTH // 2 - shop_text.get_width() // 2, 100))
-        screen.blit(boots_button, (15, 250))
-        screen.blit(stone_button, (SCREEN_WIDTH // 2 - stone_button.get_width() // 2, 250))
-        screen.blit(shield_button, (SCREEN_WIDTH - 200, 250))
-        screen.blit(exit_button, (SCREEN_WIDTH // 2 - exit_button.get_width() // 2, 400))
-
+        screen.blit(shop, (0, 0))
         pygame.display.flip()
 
         for event in pygame.event.get():
@@ -147,17 +158,46 @@ def skill_upgrade():
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_x, mouse_y = event.pos
-                if exit_button.get_rect(center=(SCREEN_WIDTH // 2, 400)).collidepoint(mouse_x, mouse_y):
+                if 214 <= mouse_x <= 296 and 146 <= mouse_y <= 228:
+                    player.strength += 5
+                    player.currency -= 100
                     return
-                if boots_button.get_rect(center=(15, 250)).collidepoint(mouse_x, mouse_y):
-                    player.speed += 5
+                if 214 <= mouse_x <= 296 and 272 <= mouse_y <= 354:
+                    player.strength += 5
+                    player.currency -= 200
                     return
-                if stone_button.get_rect(center=(SCREEN_WIDTH // 2, 250)).collidepoint(mouse_x, mouse_y):
+                if 214 <= mouse_x <= 296 and 399 <= mouse_y <= 481:
+                    player.strength += 5
+                    player.currency -= 300
+                    return
+                #first collum
+                if 370 <= mouse_x <= 425 and 146 <= mouse_y <= 228:
+                    player.health += 10
+                    player.currency -= 100
+                    return
+                if 370 <= mouse_x <= 425 and 272 <= mouse_y <= 354:
                     player.health += 20
+                    player.currency -= 200
                     return
-                if shield_button.get_rect(center=(SCREEN_WIDTH - 200, 250)).collidepoint(mouse_x, mouse_y):
-                    player.health += 2
+                if 370 <= mouse_x <= 425 and 399 <= mouse_y <= 481:
+                    player.health += 50
+                    player.currency -= 300
                     return
+                #second collum
+                if 526 <= mouse_x <= 608 and 146 <= mouse_y <= 228:
+                    player.speed += 3
+                    player.currency -= 100
+                    return
+                if 526 <= mouse_x <= 608 and 272 <= mouse_y <= 354:
+                    player.speed += 3
+                    player.currency -= 200
+                    return
+                if 526 <= mouse_x <= 608 and 399 <= mouse_y <= 481:
+                    player.speed += 3
+                    player.currency -= 300
+                    return
+
+
 
 
 def reset_game():
@@ -198,41 +238,10 @@ pygame.time.set_timer(spawn_enemy_event, 2000)  # Спавним врагов к
 
 running = True
 
-
-class Map:
-    def __init__(self, fight_arena, SCREEN_WIDTH, SCREEN_HEIGHT):
-        # Загрузка изображения карты
-        self.image = pygame.image.load('fight_arena.png').convert()
-        self.rect = self.image.get_rect()
-
-        # Создание хитбоксов (10 пикселей от краев окна)
-        self.hitboxes = [
-            pygame.Rect(0, 0, SCREEN_WIDTH, 10),  # Верхний хитбокс
-            pygame.Rect(0, SCREEN_HEIGHT - 10, SCREEN_WIDTH, 10),  # Нижний хитбокс
-            pygame.Rect(0, 0, 10, SCREEN_HEIGHT),  # Левый хитбокс
-            pygame.Rect(SCREEN_WIDTH - 10, 0, 10, SCREEN_HEIGHT)  # Правый хитбокс
-        ]
-
-    def draw(self, screen):
-        # Отрисовка карты на экране.
-        screen.blit(self.image, self.rect)
-
-    def draw_hitboxes(self, screen):
-        # """Отрисовка хитбоксов (для отладки)."""
-        for hitbox in self.hitboxes:
-            pygame.draw.rect(screen, RED, hitbox, 2)
-
-    def check_collision(self, sprite):
-        # """Проверка столкновения спрайта с хитбоксами."""
-        for hitbox in self.hitboxes:
-            if sprite.rect.colliderect(hitbox):
-                return True
-        return False
-
-
 while running:
     keys = pygame.key.get_pressed()
-    screen.fill(BLACK)
+    screen.blit(map1, (0, 0))
+    pygame.display.flip()
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -315,11 +324,14 @@ while running:
 
     # Пули игрока против врагов
     for enemy in current_wave_enemies:
-        if pygame.sprite.spritecollide(enemy, bullets, True):
-            enemies_killed += 1
-            enemy.kill()
-            player.currency += 10
-            current_wave_enemies.remove(enemy)
+        while pygame.sprite.spritecollide(enemy, bullets, True):
+            enemy.hp -= player.strength
+            print(enemy.hp)
+            if enemy.hp <= 0:
+                enemy.kill()
+                enemies_killed += 1
+                current_wave_enemies.remove(enemy)
+                player.currency += 10
 
     # Вражеские пули против игрока
     hits = pygame.sprite.spritecollide(player, enemy_bullets, True)

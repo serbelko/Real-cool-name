@@ -28,6 +28,7 @@ class MeleeEnemy(pygame.sprite.Sprite):
         self.melee_damage = 20
         self.attack_cooldown = 1500  # мс
         self.last_attack_time = 0
+        self.hp = 15
         self.speed = 2
 
         # Анимация
@@ -36,11 +37,15 @@ class MeleeEnemy(pygame.sprite.Sprite):
         self.last_update = pygame.time.get_ticks()
         self.direction = "right"  # Начальное направление
 
+        
+
     def load_and_scale(self, path):
         """Загружает и увеличивает изображение в 2 раза"""
         img = pygame.image.load(path).convert_alpha()
         new_size = (img.get_width() * self.scale_factor, img.get_height() * self.scale_factor)
         return pygame.transform.scale(img, new_size)
+
+        
 
     def distance_to(self, player):
         return pygame.math.Vector2(
@@ -102,6 +107,7 @@ class RangedEnemy(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = random.randint(0, SCREEN_WIDTH - self.rect.width)
         self.rect.y = random.randint(0, SCREEN_HEIGHT - self.rect.height)
+        self.hp = 20
 
         # “Рабочее” окно стрельбы
         self.min_distance = 150  # если игрок ближе, отходим
@@ -164,4 +170,3 @@ class RangedEnemy(pygame.sprite.Sprite):
 
         # Делаем ограничение по экрану, чтобы враг не вышел за границы
         self.rect.clamp_ip(pygame.Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT))
-

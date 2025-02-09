@@ -13,6 +13,7 @@ class Bullet(pygame.sprite.Sprite):
         if direction.length() != 0:
             direction = direction.normalize()
         self.velocity = direction * BULLET_SPEED
+        self.strenght = 10
 
     def update(self):
         self.rect.x += self.velocity.x

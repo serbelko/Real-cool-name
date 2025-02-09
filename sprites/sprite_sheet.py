@@ -5,7 +5,7 @@ from settings import *
 pygame.init()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
-sprite_sheet_image = pygame.image.load('walk1.png').convert_alpha()
+sprite_sheet_image = pygame.image.load('sprites/walk1.png').convert_alpha()
 sprite_sheet = sprite_sheets.SpriteSheet(sprite_sheet_image)
 
 BG = (50, 50, 50)
