@@ -9,12 +9,12 @@ class MeleeEnemy(pygame.sprite.Sprite):
         super().__init__()
 
         # Коэффициент увеличения (2x)
-        self.scale_factor = 2
+        self.scale_factor = 4
 
         # Загрузка анимаций (только вправо и влево)
         self.animations = {
-            "right": [self.load_and_scale(f"sprites/melee/melee_right_{i}.png") for i in range(9)],
-            "left": [self.load_and_scale(f"sprites/melee/melee_left_{i}.png") for i in range(9)]
+            "right": [self.load_and_scale(f"assetspngs/melee/melee_right_{i}.png") for i in range(9)],
+            "left": [self.load_and_scale(f"assetspngs/melee/melee_left_{i}.png") for i in range(9)]
         }
 
         # Начальные параметры

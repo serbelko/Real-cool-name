@@ -10,10 +10,10 @@ class Player(pygame.sprite.Sprite):
 
         # Загрузка и масштабирование анимаций
         self.animations = {
-            "down": [self.load_and_scale(f"sprites/user/down_{i}.png") for i in range(7)],
-            "up": [self.load_and_scale(f"sprites/user/up_{i}.png") for i in range(7)],
-            "left": [self.load_and_scale(f"sprites/user/left_{i}.png") for i in range(7)],
-            "right": [self.load_and_scale(f"sprites/user/right_{i}.png") for i in range(7)]
+            "down": [self.load_and_scale(f"assetspngs/user/down_{i}.png") for i in range(7)],
+            "up": [self.load_and_scale(f"assetspngs/user/up_{i}.png") for i in range(7)],
+            "left": [self.load_and_scale(f"assetspngs/user/left_{i}.png") for i in range(7)],
+            "right": [self.load_and_scale(f"assetspngs/user/right_{i}.png") for i in range(7)]
         }
 
         # Начальное изображение
@@ -29,6 +29,7 @@ class Player(pygame.sprite.Sprite):
         self.direction = 'down'
         self.health = PLAYER_MAX_HEALTH
         self.speed = PLAYER_SPEED
+        self.strength = 10
         self.currency = 0
         self.skills = {}
 

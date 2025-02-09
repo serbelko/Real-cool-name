@@ -4,7 +4,9 @@ import random
 import sys
 from settings import *
 import pygame
+import time
 from sprites import *
+score = 0
 
 pygame.init()
 from settings import *
@@ -51,6 +53,33 @@ def settings_menu():
                     return
 
 
+
+def load_highscores():
+    """Загружает топ-3 счета из файла"""
+    highscores = []
+    try:
+        with open("highscores.txt", "r") as file:
+            for line in file:
+                name, score = line.strip().split()
+                highscores.append((name, int(score)))
+    except FileNotFoundError:
+        print("Файл highscores.txt не найден, создаем новый.")
+    return sorted(highscores, key=lambda x: x[1], reverse=True)[:3]  # ТОП-3 по очкам
+
+
+def update_highscores(name, score):
+    """Добавляет новый счет и заменяет слабейшего в ТОП-3"""
+    highscores = load_highscores()
+    
+    # Проверяем, стоит ли добавлять новый счет
+    if len(highscores) < 3 or score > highscores[-1][1]:  
+        highscores.append((name, score))  # Добавляем нового игрока
+        highscores = sorted(highscores, key=lambda x: x[1], reverse=True)[:3]  # ТОП-3
+    
+        # Сохраняем обновленный рейтинг
+        with open("highscores.txt", "w") as file:
+            for name, score in highscores:
+                file.write(f"{name} {score}\n")
 
 def show_instructions():
     instruction_start_time = pygame.time.get_ticks()  # Get current time
@@ -101,16 +130,99 @@ def main_menu():
                     sys.exit()
 
 
-def game_over():
+
+
+import time
+
+def game_over(score=0):
+    highscores = load_highscores()
+    is_top = len(highscores) < 3 or score > highscores[-1][1]
+    name = "" if is_top else None  
+    entering_name = is_top  
+
     while True:
         screen.fill(BLACK)
-        game_over_text = font.render("Game Over", True, WHITE)
-        reload_button = font.render("Reload Game", True, WHITE)
-        exit_button = font.render("Exit", True, WHITE)
+        
+        # Заголовок
+        if is_top:
+            title_text = font.render("Game Over", True, WHITE)
+            top_text = font.render("You are in the top!", True, WHITE)
+            screen.blit(title_text, (SCREEN_WIDTH // 2 - title_text.get_width() // 2, 100))
+            screen.blit(top_text, (SCREEN_WIDTH // 2 - top_text.get_width() // 2, 150))
+        else:
+            title_text = font.render("Game Over", True, WHITE)
+            screen.blit(title_text, (SCREEN_WIDTH // 2 - title_text.get_width() // 2, 100))
 
-        screen.blit(game_over_text, (SCREEN_WIDTH // 2 - game_over_text.get_width() // 2, 200))
-        screen.blit(reload_button, (SCREEN_WIDTH // 2 - reload_button.get_width() // 2, 300))
-        screen.blit(exit_button, (SCREEN_WIDTH // 2 - exit_button.get_width() // 2, 400))
+        # Отображение ТОП-3
+        y_offset = 200 if is_top else 150
+        for i, (player_name, player_score) in enumerate(highscores):
+            score_text = font.render(f"{i+1}. {player_name}: {player_score}", True, WHITE)
+            screen.blit(score_text, (SCREEN_WIDTH // 2 - score_text.get_width() // 2, y_offset + i * 40))
+
+        # Ввод имени опущен ниже (y = 320)
+        if entering_name:
+            cursor = "|" if time.time() % 1 > 0.5 else ""
+            input_text = font.render(f"Enter Your Name: {name}{cursor}", True, WHITE)
+            screen.blit(input_text, (SCREEN_WIDTH // 2 - input_text.get_width() // 2, 320))
+
+        # Кнопки Restart и Exit ниже (y = 380, y = 430)
+        restart_text = font.render("Restart", True, WHITE)
+        exit_text = font.render("Exit", True, WHITE)
+        screen.blit(restart_text, (SCREEN_WIDTH // 2 - restart_text.get_width() // 2, 380))
+        screen.blit(exit_text, (SCREEN_WIDTH // 2 - exit_text.get_width() // 2, 430))
+
+        pygame.display.flip()
+
+        # Обработка событий
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            elif event.type == pygame.KEYDOWN:
+                if entering_name:
+                    if event.key == pygame.K_RETURN and name:
+                        update_highscores(name, score)  
+                        highscores = load_highscores()  
+                        entering_name = False  
+                    elif event.key == pygame.K_BACKSPACE:
+                        name = name[:-1]
+                    elif len(name) < 10:
+                        name += event.unicode
+                else:
+                    if event.key == pygame.K_r:
+                        return True  
+                    if event.key == pygame.K_ESCAPE or event.key == pygame.K_q:
+                        pygame.quit()
+                        sys.exit()
+
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_x, mouse_y = event.pos
+                if restart_text.get_rect(center=(SCREEN_WIDTH // 2, 380)).collidepoint(mouse_x, mouse_y):
+                    return True  
+                if exit_text.get_rect(center=(SCREEN_WIDTH // 2, 430)).collidepoint(mouse_x, mouse_y):
+                    pygame.quit()
+                    sys.exit()
+
+
+
+
+
+def show_highscores():
+    """Отображает ТОП-3 счета"""
+    highscores = load_highscores()
+
+    while True:
+        screen.fill(BLACK)
+        title_text = font.render("Top 3 High Scores", True, WHITE)
+        screen.blit(title_text, (SCREEN_WIDTH // 2 - title_text.get_width() // 2, 100))
+
+        # Отображаем ТОП-3
+        for i, (name, score) in enumerate(highscores):
+            score_text = font.render(f"{i+1}. {name}: {score}", True, WHITE)
+            screen.blit(score_text, (SCREEN_WIDTH // 2 - score_text.get_width() // 2, 150 + i * 50))
+
+        exit_text = font.render("Press SPACE to restart", True, WHITE)
+        screen.blit(exit_text, (SCREEN_WIDTH // 2 - exit_text.get_width() // 2, 350))
 
         pygame.display.flip()
 
@@ -118,14 +230,11 @@ def game_over():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                mouse_x, mouse_y = event.pos
-                if reload_button.get_rect(center=(SCREEN_WIDTH // 2, 300)).collidepoint(mouse_x, mouse_y):
-                    return True
-                if exit_button.get_rect(center=(SCREEN_WIDTH // 2, 400)).collidepoint(mouse_x, mouse_y):
-                    pygame.quit()
-                    sys.exit()
-    return False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    return True  # Перезапуск игры
+
+
 
 
 def pause_menu():
@@ -201,13 +310,16 @@ def skill_upgrade():
 
 
 def reset_game():
-    global player, player_group, bullets, enemies, enemy_bullets, last_shot_time
+    global player, player_group, bullets, enemies, enemy_bullets, last_shot_time, current_wave_enemies, enemies_to_spawn, spawned_enemies, score
     player = Player()
     player_group = pygame.sprite.Group(player)
     bullets = pygame.sprite.Group()
-    enemy_bullets = pygame.sprite.Group()
     enemies = pygame.sprite.Group()
+    current_wave_enemies = pygame.sprite.Group()
+    enemies_to_spawn = 10  # Количество врагов в волне (можно изменять для разных волн)
+    spawned_enemies = 0  # Счетчик заспавненных врагов
     last_shot_time = 0
+    score = 0
 
 
 def next_wave():
@@ -328,6 +440,7 @@ while running:
             enemy.hp -= player.strength
             print(enemy.hp)
             if enemy.hp <= 0:
+                score += 10
                 enemy.kill()
                 enemies_killed += 1
                 current_wave_enemies.remove(enemy)
@@ -341,7 +454,7 @@ while running:
 
     # Проверяем, не умер ли игрок
     if player.health <= 0:
-        if game_over():
+        if game_over(score):
             reset_game()
         else:
             running = False
@@ -364,6 +477,9 @@ while running:
     # Отображаем кошелек игрока
     currency_text = font.render(f'GOLD: {player.currency}', True, WHITE)
     screen.blit(currency_text, (10, 30))
+
+    score_text = font.render(f"Your Score: {score}", True, WHITE)
+    screen.blit(score_text, (10, 50))
 
     pygame.display.flip()
     clock.tick(60)
