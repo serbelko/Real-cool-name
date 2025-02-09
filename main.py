@@ -36,6 +36,7 @@ menu_bg = pygame.image.load('assetspngs/main_menu.png').convert_alpha()
 pause_bg = pygame.image.load('assetspngs/pause_menu.png').convert_alpha()
 instructions = pygame.image.load('assetspngs/instructions.png').convert_alpha()
 enter = pygame.image.load('assetspngs/ENTER.png').convert_alpha()
+shop = pygame.image.load('assetspngs/shop_menu.png').convert_alpha()
 
 
 def settings_menu():
@@ -157,19 +158,7 @@ def pause_menu():
 
 def skill_upgrade():
     while True:
-        screen.fill(BLACK)
-        shop_text = font.render("SHOP", True, WHITE)
-        boots_button = font.render("SPEEDY BOOTS", True, WHITE)
-        stone_button = font.render("HEALING STONE", True, WHITE)
-        shield_button = font.render("MAGIC SHIELD", True, WHITE)
-        exit_button = font.render("Exit", True, WHITE)
-
-        screen.blit(shop_text, (SCREEN_WIDTH // 2 - shop_text.get_width() // 2, 100))
-        screen.blit(boots_button, (15, 250))
-        screen.blit(stone_button, (SCREEN_WIDTH // 2 - stone_button.get_width() // 2, 250))
-        screen.blit(shield_button, (SCREEN_WIDTH - 200, 250))
-        screen.blit(exit_button, (SCREEN_WIDTH // 2 - exit_button.get_width() // 2, 400))
-
+        screen.blit(shop, (0, 0))
         pygame.display.flip()
 
         for event in pygame.event.get():
@@ -178,17 +167,46 @@ def skill_upgrade():
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_x, mouse_y = event.pos
-                if exit_button.get_rect(center=(SCREEN_WIDTH // 2, 400)).collidepoint(mouse_x, mouse_y):
+                if 214 <= mouse_x <= 296 and 146 <= mouse_y <= 228:
+                    player.strength += 5
+                    player.currency -= 100
                     return
-                if boots_button.get_rect(center=(15, 250)).collidepoint(mouse_x, mouse_y):
-                    player.speed += 5
+                if 214 <= mouse_x <= 296 and 272 <= mouse_y <= 354:
+                    player.strength += 5
+                    player.currency -= 200
                     return
-                if stone_button.get_rect(center=(SCREEN_WIDTH // 2, 250)).collidepoint(mouse_x, mouse_y):
+                if 214 <= mouse_x <= 296 and 399 <= mouse_y <= 481:
+                    player.strength += 5
+                    player.currency -= 300
+                    return
+                #first collum
+                if 370 <= mouse_x <= 425 and 146 <= mouse_y <= 228:
+                    player.health += 10
+                    player.currency -= 100
+                    return
+                if 370 <= mouse_x <= 425 and 272 <= mouse_y <= 354:
                     player.health += 20
+                    player.currency -= 200
                     return
-                if shield_button.get_rect(center=(SCREEN_WIDTH - 200, 250)).collidepoint(mouse_x, mouse_y):
-                    player.health += 2
+                if 370 <= mouse_x <= 425 and 399 <= mouse_y <= 481:
+                    player.health += 50
+                    player.currency -= 300
                     return
+                #second collum
+                if 526 <= mouse_x <= 608 and 146 <= mouse_y <= 228:
+                    player.speed += 3
+                    player.currency -= 100
+                    return
+                if 526 <= mouse_x <= 608 and 272 <= mouse_y <= 354:
+                    player.speed += 3
+                    player.currency -= 200
+                    return
+                if 526 <= mouse_x <= 608 and 399 <= mouse_y <= 481:
+                    player.speed += 3
+                    player.currency -= 300
+                    return
+
+
 
 
 def reset_game():
