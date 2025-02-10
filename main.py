@@ -30,6 +30,9 @@ instructions = pygame.image.load('assetspngs/instructions.png').convert_alpha()
 enter = pygame.image.load('assetspngs/ENTER.png').convert_alpha()
 shop = pygame.image.load('assetspngs/shop_menu.png').convert_alpha()
 map1 = pygame.image.load('assetspngs/maps/map1.png').convert_alpha()
+gameover_bg = pygame.image.load('assetspngs/game_over.png').convert_alpha()
+
+
 def settings_menu():
     while True:
         screen.fill(BLACK)
@@ -49,7 +52,6 @@ def settings_menu():
                 mouse_x, mouse_y = event.pos
                 if back_button_text.get_rect(center=(SCREEN_WIDTH // 2, 400)).collidepoint(mouse_x, mouse_y):
                     return
-
 
 
 def show_instructions():
@@ -103,15 +105,7 @@ def main_menu():
 
 def game_over():
     while True:
-        screen.fill(BLACK)
-        game_over_text = font.render("Game Over", True, WHITE)
-        reload_button = font.render("Reload Game", True, WHITE)
-        exit_button = font.render("Exit", True, WHITE)
-
-        screen.blit(game_over_text, (SCREEN_WIDTH // 2 - game_over_text.get_width() // 2, 200))
-        screen.blit(reload_button, (SCREEN_WIDTH // 2 - reload_button.get_width() // 2, 300))
-        screen.blit(exit_button, (SCREEN_WIDTH // 2 - exit_button.get_width() // 2, 400))
-
+        screen.blit(gameover_bg, (0, 0))
         pygame.display.flip()
 
         for event in pygame.event.get():
@@ -120,11 +114,13 @@ def game_over():
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_x, mouse_y = event.pos
-                if reload_button.get_rect(center=(SCREEN_WIDTH // 2, 300)).collidepoint(mouse_x, mouse_y):
-                    return True
-                if exit_button.get_rect(center=(SCREEN_WIDTH // 2, 400)).collidepoint(mouse_x, mouse_y):
-                    pygame.quit()
-                    sys.exit()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    mouse_x, mouse_y = event.pos
+                    if 341 <= mouse_x <= 458 and 250 <= mouse_y <= 303:
+                        return True
+                    if 341 <= mouse_x <= 458 and 315 <= mouse_y <= 368:
+                        pygame.quit()
+                        sys.exit()
     return False
 
 
@@ -170,7 +166,7 @@ def skill_upgrade():
                     player.strength += 5
                     player.currency -= 300
                     return
-                #first collum
+                # first collum
                 if 370 <= mouse_x <= 425 and 146 <= mouse_y <= 228:
                     player.health += 10
                     player.currency -= 100
@@ -183,7 +179,7 @@ def skill_upgrade():
                     player.health += 50
                     player.currency -= 300
                     return
-                #second collum
+                # second collum
                 if 526 <= mouse_x <= 608 and 146 <= mouse_y <= 228:
                     player.speed += 3
                     player.currency -= 100
@@ -196,8 +192,6 @@ def skill_upgrade():
                     player.speed += 3
                     player.currency -= 300
                     return
-
-
 
 
 def reset_game():

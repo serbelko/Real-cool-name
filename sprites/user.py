@@ -31,6 +31,7 @@ class Player(pygame.sprite.Sprite):
         self.speed = PLAYER_SPEED
         self.currency = 0
         self.skills = {}
+        self.strength = 5
 
         # Анимация
         self.current_frame = 0
